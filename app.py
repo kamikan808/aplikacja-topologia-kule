@@ -96,7 +96,7 @@ with st.sidebar:
     default_point_str, default_center_str = generate_defaults(n)
     point_str = st.text_input(f"Punkt w $R^{n}$", default_point_str)
     center_str = st.text_input(f"Środek kuli w $R^{n}$", default_center_str)
-    promien = st.number_input("Promień kuli", min_value=0, value=2.0, step=0.1)
+    promien = st.number_input("Promień kuli", min_value=0.0, value=2.0, step=0.1)
 
 # ----- Przetwarzanie danych wejściowych i obliczenia ----
 # Odczytanie i przetworzenie wektorów punktu i środka
@@ -129,14 +129,20 @@ if point is not None and center is not None: # Sprawdzenie poprawności danych w
                 st.warning(f"**Punkt nie należy do kuli otwartej** w metryce {metric_name}.")
 
         elif zbior_typ == "Kula domknięta":
-            if dist < promien or is_close:
+            if dist < promien or is_close and promien == 0:
+                st.success(f"**Punkt należy do kuli domkniętej, która jest jednocześnie Sferą** w metryce {metric_name}.")
+            elif dist < promien or is_close:
                 st.success(f"**Punkt należy do kuli domkniętej** w metryce {metric_name}.")
+            elif dist > promien or not is_close:
+                st.warning(f"**Punkt nie leży na sferze ani nie należy do kuli domkniętej** w metryce {metric_name}.")
             else:
                 st.warning(f"**Punkt nie należy do kuli domkniętej** w metryce {metric_name}.")
 
         elif zbior_typ == "Sfera":
             if is_close:
-                st.success(f"**Punkt leży na sferze** w metryce {metric_name}.")
+                st.success(f"**Punkt należy do kuli domkniętej, która jest jednocześnie Sferą** w metryce {metric_name}.")
+            elif not is_close:
+                st.warning(f"**Punkt nie leży na sferze ani nie należy do kuli domkniętej** w metryce {metric_name}.")
             else:
                 st.warning(f"**Punkt nie leży na sferze** w metryce {metric_name}.")
     if metric_name in ["Hamminga","Dyskretna"]:
