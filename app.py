@@ -424,7 +424,12 @@ if point is not None and center is not None: # Sprawdzenie poprawności danych w
                     ]
                     
                     points_in_grid = np.vstack([X.ravel(), Y.ravel(), Z.ravel()]).T
-                    distances = np.linalg.norm(points_in_grid - center, ord=p_value, axis=1).reshape(X.shape)
+                    if p_value >= 1:
+                        distances = np.linalg.norm(points_in_grid - center, ord=p_value, axis=1).reshape(X.shape)
+                    else:
+                        diffs = np.abs(points_in_grid - center)
+                        distances = (diffs[:, 0]**p_value + diffs[:, 1]**p_value + diffs[:,2]**p_value)
+                        distances = distances.reshape(X.shape)
 
                     fig.add_trace(go.Isosurface(
                         x=X.flatten(), y=Y.flatten(), z=Z.flatten(),
