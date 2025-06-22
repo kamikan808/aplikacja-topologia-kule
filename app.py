@@ -96,7 +96,7 @@ with st.sidebar:
     default_point_str, default_center_str = generate_defaults(n)
     point_str = st.text_input(f"Punkt w $R^{n}$", default_point_str)
     center_str = st.text_input(f"Środek kuli w $R^{n}$", default_center_str)
-    promien = st.number_input("Promień kuli", min_value=0.1, value=2.0, step=0.1)
+    promien = st.number_input("Promień kuli", min_value=0, value=2.0, step=0.1)
 
 # ----- Przetwarzanie danych wejściowych i obliczenia ----
 # Odczytanie i przetworzenie wektorów punktu i środka
