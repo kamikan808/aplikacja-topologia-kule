@@ -41,14 +41,14 @@ def calculate_distance(p1: np.ndarray, p2: np.ndarray, p_value: float) -> float:
         if p_value == 'hamming':
             if len(p1) != len(p2):
                 raise ValueError("Wektory muszą mieć ten sam rozmiar dla metryki Hamminga.")
-            return np.sum(p1 != p2)  #Hamming
+            return np.sum(p1 != p2) 
         elif p_value == 'discrete':
             return 0.0 if np.array_equal(p1, p2) else 1.0
     if p_value == np.inf: #obługa metryki Czebyszewa
         return np.linalg.norm(p1 - p2, ord=np.inf)
     if p_value >= 1:
         return np.linalg.norm(p1 - p2, ord=p_value)
-    # dla p < 1: NIE używamy pierwiastka (czyli "quasi-dystans")
+    # dla p < 1: NIE używamy pierwiastka
     return np.sum(np.abs(p1-p2) ** p_value)
 
 # ------------------- Interfejs strony -------------------
@@ -120,7 +120,6 @@ if point is not None and center is not None: # Sprawdzenie poprawności danych w
         st.metric(label="Promień kuli", value=f"{promien:.4f}")
 
         # Logika przynależności do zbiorów
-        # Ustal tolerancję porównania
         is_close = np.isclose(dist, promien, atol=1e-4)
 
         if zbior_typ == "Kula otwarta":
@@ -192,19 +191,16 @@ if point is not None and center is not None: # Sprawdzenie poprawności danych w
                     if p_value >=1:
                         def p_metric_circle(center, r, p, num_points=200):
                             if p == np.inf:
-                                # Kwadrat z zaokrągleniem rogów poprzez interpolację narożników
-                                # Prostokąt o bokach 2r, środku w center
                                 x = []
                                 y = []
                                 steps = num_points // 4
-                                # cztery boki kwadratu (startujemy od góry w prawo, przeciwnie do wskazówek zegara)
-                                x += list(np.linspace(center[0] - r, center[0] + r, steps))         # góra
+                                x += list(np.linspace(center[0] - r, center[0] + r, steps))         
                                 y += [center[1] + r] * steps
-                                x += [center[0] + r] * steps                                        # prawa
+                                x += [center[0] + r] * steps                                     
                                 y += list(np.linspace(center[1] + r, center[1] - r, steps))
-                                x += list(np.linspace(center[0] + r, center[0] - r, steps))         # dół
+                                x += list(np.linspace(center[0] + r, center[0] - r, steps))     
                                 y += [center[1] - r] * steps
-                                x += [center[0] - r] * steps                                        # lewa
+                                x += [center[0] - r] * steps                                      
                                 y += list(np.linspace(center[1] - r, center[1] + r, steps))
                                 return np.array(x), np.array(y)
                             else:
@@ -234,22 +230,21 @@ if point is not None and center is not None: # Sprawdzenie poprawności danych w
                                 mode='lines',
                                 line=dict(color='RoyalBlue', width=3),
                                 showlegend=False,
-                                hoverinfo='none' # Ukryj informacje po najechaniu myszą
+                                hoverinfo='none'
                             ))
 
                         elif zbior_typ == "Kula domknięta":
-                            circle_x, circle_y = p_metric_circle(center, promien, p_value) # Wypełnienie kuli domkniętej (bez widocznego konturu na krawędzi wypełnienia)
+                            circle_x, circle_y = p_metric_circle(center, promien, p_value) 
                             fig.add_trace(go.Scatter(
                                     x=circle_x, y=circle_y,
                                     mode='lines',
                                     fill='toself', 
-                                    fillcolor='rgba(65, 105, 225, 0.1)', # Ustaw przezroczysty kolor wypełnienia
+                                    fillcolor='rgba(65, 105, 225, 0.1)', 
                                     line=dict(width=0), 
                                     showlegend=False,
                                     hoverinfo='none'
                                 ))
 
-                                # Rysowanie granicy (okręgu) za pomocą go.Scatter
                             circle_x, circle_y = p_metric_circle(center, promien, p_value)
 
                             fig.add_trace(go.Scatter(
@@ -257,17 +252,16 @@ if point is not None and center is not None: # Sprawdzenie poprawności danych w
                                     mode='lines',
                                     line=dict(color='RoyalBlue', width=3),
                                     showlegend=False,
-                                    hoverinfo='none' # Ukryj informacje po najechaniu myszą
+                                    hoverinfo='none' 
                                 ))
 
                         elif zbior_typ == "Kula otwarta":
                             circle_x, circle_y = p_metric_circle(center, promien, p_value)
-                                    # Wypełnienie kuli domkniętej (bez widocznego konturu na krawędzi wypełnienia)
                             fig.add_trace(go.Scatter(
                                     x=circle_x, y=circle_y,
                                     mode='lines',
                                     fill='toself', 
-                                    fillcolor='rgba(65, 105, 225, 0.1)', # Ustaw przezroczysty kolor wypełnienia
+                                    fillcolor='rgba(65, 105, 225, 0.1)', 
                                     line=dict(width=0), 
                                     showlegend=False,
                                     hoverinfo='none'
@@ -278,11 +272,11 @@ if point is not None and center is not None: # Sprawdzenie poprawności danych w
                                 mode='lines',
                                 line=dict(color='RoyalBlue', width=3, dash='dash'),
                                 showlegend=False,
-                                hoverinfo='none' # Ukryj informacje po najechaniu myszą
+                                hoverinfo='none' 
                             ))
 
                         fig.update_layout(
-                        yaxis=dict(scaleanchor="x", scaleratio=1), # <-- Ta linia jest kluczowa i musi być w dict yaxis
+                        yaxis=dict(scaleanchor="x", scaleratio=1), 
                         xaxis=dict(constrain='domain'),
                         autosize=False,
                         width=600,
@@ -308,7 +302,6 @@ if point is not None and center is not None: # Sprawdzenie poprawności danych w
                                 (x, y): współrzędne punktów na brzegu
                             """
                             if p == np.inf:
-                                # Kwadrat jako granica normy nieskończoności
                                 x = []
                                 y = []
                                 steps = num_points // 4
@@ -355,22 +348,21 @@ if point is not None and center is not None: # Sprawdzenie poprawności danych w
                                 mode='lines',
                                 line=dict(color='RoyalBlue', width=3),
                                 showlegend=False,
-                                hoverinfo='none' # Ukryj informacje po najechaniu myszą
+                                hoverinfo='none' 
                             ))
 
                         elif zbior_typ == "Kula domknięta":
-                            circle_x, circle_y = p_norm_boundary_points(center, promien, p_value) # Wypełnienie kuli domkniętej (bez widocznego konturu na krawędzi wypełnienia)
+                            circle_x, circle_y = p_norm_boundary_points(center, promien, p_value) 
                             fig.add_trace(go.Scatter(
                                     x=circle_x, y=circle_y,
                                     mode='lines',
                                     fill='toself', 
-                                    fillcolor='rgba(65, 105, 225, 0.1)', # Ustaw przezroczysty kolor wypełnienia
+                                    fillcolor='rgba(65, 105, 225, 0.1)',
                                     line=dict(width=0), 
                                     showlegend=False,
                                     hoverinfo='none'
                                 ))
 
-                                # Rysowanie granicy (okręgu) za pomocą go.Scatter
                             circle_x, circle_y = p_norm_boundary_points(center, promien, p_value)
 
                             fig.add_trace(go.Scatter(
@@ -378,17 +370,16 @@ if point is not None and center is not None: # Sprawdzenie poprawności danych w
                                     mode='lines',
                                     line=dict(color='RoyalBlue', width=3),
                                     showlegend=False,
-                                    hoverinfo='none' # Ukryj informacje po najechaniu myszą
+                                    hoverinfo='none'
                                 ))
 
                         elif zbior_typ == "Kula otwarta":
                             circle_x, circle_y = p_norm_boundary_points(center, promien, p_value)
-                                    # Wypełnienie kuli domkniętej (bez widocznego konturu na krawędzi wypełnienia)
                             fig.add_trace(go.Scatter(
                                     x=circle_x, y=circle_y,
                                     mode='lines',
                                     fill='toself', 
-                                    fillcolor='rgba(65, 105, 225, 0.1)', # Ustaw przezroczysty kolor wypełnienia
+                                    fillcolor='rgba(65, 105, 225, 0.1)',
                                     line=dict(width=0), 
                                     showlegend=False,
                                     hoverinfo='none'
@@ -399,11 +390,11 @@ if point is not None and center is not None: # Sprawdzenie poprawności danych w
                                 mode='lines',
                                 line=dict(color='RoyalBlue', width=3, dash='dash'),
                                 showlegend=False,
-                                hoverinfo='none' # Ukryj informacje po najechaniu myszą
+                                hoverinfo='none' 
                             ))
 
                         fig.update_layout(
-                        yaxis=dict(scaleanchor="x", scaleratio=1), # <-- Ta linia jest kluczowa i musi być w dict yaxis
+                        yaxis=dict(scaleanchor="x", scaleratio=1),
                         xaxis=dict(constrain='domain'),
                         autosize=False,
                         width=600,
@@ -414,7 +405,7 @@ if point is not None and center is not None: # Sprawdzenie poprawności danych w
 
                         fig.update_xaxes(range=[center[0] - plot_range, center[0] + plot_range])
                         fig.update_yaxes(range=[center[1] - plot_range, center[1] + plot_range])
-                elif n == 3: # Ogólna wizualizacja 3D za pomocą izopowierzchni
+                elif n == 3: 
                     grid_res = 40
                     plot_range = promien * 1.5
                     X, Y, Z = np.mgrid[
@@ -434,7 +425,7 @@ if point is not None and center is not None: # Sprawdzenie poprawności danych w
                     fig.add_trace(go.Isosurface(
                         x=X.flatten(), y=Y.flatten(), z=Z.flatten(),
                         value=distances.flatten(),
-                        isomin=promien, isomax=promien, # Rysuj powierzchnię dla wartości równej 'promien'
+                        isomin=promien, isomax=promien, 
                         surface_count=1,
                         opacity=0.4,
                         caps=dict(x_show=False, y_show=False, z_show=False),
